@@ -75,4 +75,4 @@ No configuration needed — just drop in the callout and start checking things o
 
 ## Feedback & Contributions
 
-Found a bug or have a feature request? Open an issue on [GitHub](https://github.com/). Pull requests are welcome.
+Found a bug or have a feature request? Open an issue on [GitHub](https://github.com/profesr-chaos/obsidian-checklist-progress-bar). Pull requests are welcome.
