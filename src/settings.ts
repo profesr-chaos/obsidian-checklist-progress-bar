@@ -1,38 +1,24 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
-import MyPlugin from './main';
+import { App, PluginSettingTab } from 'obsidian';
+import ChecklistProgressBar from './main';
 
 export interface MyPluginSettings {
-	mySetting: string;
+    // Ready for future settings
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default',
-};
+export const DEFAULT_SETTINGS: MyPluginSettings = {};
 
 export class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+    plugin: ChecklistProgressBar;
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+    constructor(app: App, plugin: ChecklistProgressBar) {
+        super(app, plugin);
+        this.plugin = plugin;
+    }
 
-	display(): void {
-		const { containerEl } = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Settings #1')
-			.setDesc("It's a secret")
-			.addText((text) =>
-				text
-					.setPlaceholder('Enter your secret')
-					.setValue(this.plugin.settings.mySetting)
-					.onChange(async (value) => {
-						this.plugin.settings.mySetting = value;
-						await this.plugin.saveSettings();
-					}),
-			);
-	}
+    display(): void {
+        const { containerEl } = this;
+        containerEl.empty();
+        containerEl.createEl('h2', { text: 'Checklist Progress Bar' });
+        containerEl.createEl('p', { text: 'Progress bars are automatically displayed above checklist blocks.' });
+    }
 }

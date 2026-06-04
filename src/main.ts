@@ -1,114 +1,129 @@
 import {
-	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
-	Modal,
-	Notice,
-	Plugin,
+    Editor,
+    MarkdownView,
+    Plugin,
+    WorkspaceLeaf,
 } from 'obsidian';
 import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-	SampleSettingTab,
+    DEFAULT_SETTINGS,
+    MyPluginSettings,
+    SampleSettingTab,
 } from './settings';
 
-// Remember to rename these classes and interfaces!
+export default class ChecklistProgressBar extends Plugin {
+    settings!: MyPluginSettings;
 
-export default class MyPlugin extends Plugin {
-	settings!: MyPluginSettings;
+    async onload() {
+        await this.loadSettings();
+        this.addSettingTab(new SampleSettingTab(this.app, this));
 
-	async onload() {
-		await this.loadSettings();
+        this.registerEvent(
+            this.app.workspace.on('editor-change', (editor: Editor) => {
+                this.updateProgressBars(editor);
+            })
+        );
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+        this.registerEvent(
+            this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf | null) => {
+                if (!leaf) return;
+                const view = leaf.view;
+                if (view instanceof MarkdownView && view.editor) {
+                    this.updateProgressBars(view.editor);
+                }
+            })
+        );
+    }
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				editor.replaceSelection('Sample editor command');
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			},
-		});
+    private updateProgressBars(editor: Editor): void {
+        const content = editor.getValue();
+        const lines = content.split('\n');
+        const result = this.processLines(lines);
+        const newContent = result.join('\n');
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+        if (newContent !== content) {
+            const cursor = editor.getCursor();
+            editor.setValue(newContent);
+            editor.setCursor(cursor);
+        }
+    }
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
+    private processLines(lines: string[]): string[] {
+        const result: string[] = [];
+        let i = 0;
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
-	}
+        while (i < lines.length) {
+            const line = lines[i];
+            if (line === undefined) break;
 
-	onunload() {}
+            if (this.isProgressBarLine(line)) {
+                // Find all checklist items between this progress bar and the next one
+                const checklistItems: string[] = [];
+                let j = i + 1;
 
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
-	}
+                while (j < lines.length) {
+                    const nextLine = lines[j];
+                    if (nextLine === undefined) break;
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
+                    // Stop at the next progress bar
+                    if (this.isProgressBarLine(nextLine)) break;
 
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
+                    if (this.isChecklistItem(nextLine)) {
+                        checklistItems.push(nextLine);
+                    }
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
+                    j++;
+                }
+
+                const total = checklistItems.length;
+                const checked = checklistItems.filter(l => this.isChecked(l)).length;
+
+                // Replace the progress bar line with updated values
+                result.push(this.buildProgressBar(checked, total));
+                i++;
+            } else {
+                result.push(line);
+                i++;
+            }
+        }
+
+        return result;
+    }
+
+    private buildProgressBar(checked: number, total: number): string {
+        if (total === 0) return '> [!progress] No checklist items found';
+
+        const percentage = Math.round((checked / total) * 100);
+        const barLength = 20;
+        const filled = Math.round((checked / total) * barLength);
+        const empty = barLength - filled;
+        const bar = '█'.repeat(filled) + '░'.repeat(empty);
+
+
+        return `> [!progress] ${bar} ${checked}/${total} (${percentage}%)`;
+    }
+
+    private isProgressBarLine(line: string): boolean {
+        return /^>\s*\[!progress\]/.test(line);
+    }
+
+    private isChecklistItem(line: string): boolean {
+        return /^(\s*)-\s+\[( |x|X)\]/.test(line);
+    }
+
+    private isChecked(line: string): boolean {
+        return /^(\s*)-\s+\[x\]/i.test(line);
+    }
+
+    private getIndentLevel(line: string): number {
+        const match = line.match(/^(\s*)/);
+        return match ? match[1]?.length ?? 0 : 0;
+    }
 }

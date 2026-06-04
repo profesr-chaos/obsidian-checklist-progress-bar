@@ -1,8 +1,38 @@
-/*
+.callout[data-callout="progress"] {
+    --callout-color: 120, 80, 220;
+    --callout-icon: none;
+    background-color: #1e1e2e;
+    border: 1px solid rgba(120, 80, 220, 0.4);
+    border-left: 3px solid rgba(120, 80, 220, 0.9);
+    border-radius: 6px;
+    font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+    padding: 8px 14px;
+    margin: 4px 0;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.callout[data-callout="progress"] .callout-title {
+    color: #c8b8f8;
+    font-size: 0.9em;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-shadow: none;
+}
 
-If your plugin does not need CSS, delete this file.
+.callout[data-callout="progress"] .callout-icon {
+    display: none;
+}
 
-*/
+.callout[data-callout="progress"] .callout-fold {
+    display: none;
+}
+
+/* Light theme overrides */
+.theme-light .callout[data-callout="progress"] {
+    background-color: #f5f3ff;
+    border: 1px solid rgba(100, 60, 200, 0.25);
+    border-left: 3px solid rgba(100, 60, 200, 0.8);
+}
+
+.theme-light .callout[data-callout="progress"] .callout-title {
+    color: #5b21b6;
+}
