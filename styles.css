@@ -1,38 +1,110 @@
-.callout[data-callout="progress"] {
-    --callout-color: 120, 80, 220;
+/* ---------------------------------------------------------------------------
+   Progress callout
+   Base styling applies to every variant. A colour token in the callout label
+   (e.g. `> [!progress bl]`) only overrides the accent triplet.
+   Obsidian lowercases the label into data-callout, so "progress bl" is the
+   attribute value. Hyphen and underscore forms are matched as well.
+   --------------------------------------------------------------------------- */
+
+.callout[data-callout^="progress"] {
+    --pb-accent: 120, 80, 220;
+    --pb-surface: #1e1e2e;
+
+    --callout-color: var(--pb-accent);
     --callout-icon: none;
-    background-color: #1e1e2e;
-    border: 1px solid rgba(120, 80, 220, 0.4);
-    border-left: 3px solid rgba(120, 80, 220, 0.9);
+
+    background-color: var(--pb-surface);
+    border: 1px solid rgba(var(--pb-accent), 0.4);
+    border-left: 3px solid rgba(var(--pb-accent), 0.9);
     border-radius: 6px;
     font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
     padding: 8px 14px;
     margin: 4px 0;
 }
 
-.callout[data-callout="progress"] .callout-title {
-    color: #c8b8f8;
+.callout[data-callout^="progress"] .callout-title {
+    color: color-mix(in srgb, rgb(var(--pb-accent)) 45%, #ffffff);
     font-size: 0.9em;
     font-weight: 500;
     letter-spacing: 0.04em;
     text-shadow: none;
 }
 
-.callout[data-callout="progress"] .callout-icon {
+.callout[data-callout^="progress"] .callout-icon,
+.callout[data-callout^="progress"] .callout-fold {
     display: none;
 }
 
-.callout[data-callout="progress"] .callout-fold {
-    display: none;
+/* Colour variants ---------------------------------------------------------- */
+
+.callout[data-callout="progress bl"],
+.callout[data-callout="progress-bl"],
+.callout[data-callout="progress_bl"] { --pb-accent: 56, 132, 255; }   /* blue */
+
+.callout[data-callout="progress cy"],
+.callout[data-callout="progress-cy"],
+.callout[data-callout="progress_cy"] { --pb-accent: 34, 190, 220; }   /* cyan */
+
+.callout[data-callout="progress te"],
+.callout[data-callout="progress-te"],
+.callout[data-callout="progress_te"] { --pb-accent: 26, 178, 160; }   /* teal */
+
+.callout[data-callout="progress gr"],
+.callout[data-callout="progress-gr"],
+.callout[data-callout="progress_gr"] { --pb-accent: 48, 176, 96; }    /* green */
+
+.callout[data-callout="progress li"],
+.callout[data-callout="progress-li"],
+.callout[data-callout="progress_li"] { --pb-accent: 132, 196, 36; }   /* lime */
+
+.callout[data-callout="progress ye"],
+.callout[data-callout="progress-ye"],
+.callout[data-callout="progress_ye"] { --pb-accent: 216, 186, 30; }   /* yellow */
+
+.callout[data-callout="progress am"],
+.callout[data-callout="progress-am"],
+.callout[data-callout="progress_am"] { --pb-accent: 230, 160, 24; }   /* amber */
+
+.callout[data-callout="progress or"],
+.callout[data-callout="progress-or"],
+.callout[data-callout="progress_or"] { --pb-accent: 238, 124, 32; }   /* orange */
+
+.callout[data-callout="progress re"],
+.callout[data-callout="progress-re"],
+.callout[data-callout="progress_re"] { --pb-accent: 226, 66, 66; }    /* red */
+
+.callout[data-callout="progress pi"],
+.callout[data-callout="progress-pi"],
+.callout[data-callout="progress_pi"] { --pb-accent: 236, 92, 156; }   /* pink */
+
+.callout[data-callout="progress ma"],
+.callout[data-callout="progress-ma"],
+.callout[data-callout="progress_ma"] { --pb-accent: 208, 64, 208; }   /* magenta */
+
+.callout[data-callout="progress pu"],
+.callout[data-callout="progress-pu"],
+.callout[data-callout="progress_pu"] { --pb-accent: 120, 80, 220; }   /* purple */
+
+.callout[data-callout="progress in"],
+.callout[data-callout="progress-in"],
+.callout[data-callout="progress_in"] { --pb-accent: 80, 88, 224; }    /* indigo */
+
+.callout[data-callout="progress br"],
+.callout[data-callout="progress-br"],
+.callout[data-callout="progress_br"] { --pb-accent: 150, 104, 68; }   /* brown */
+
+.callout[data-callout="progress gy"],
+.callout[data-callout="progress-gy"],
+.callout[data-callout="progress_gy"] { --pb-accent: 138, 144, 158; }  /* grey */
+
+/* Light theme -------------------------------------------------------------- */
+
+.theme-light .callout[data-callout^="progress"] {
+    --pb-surface: color-mix(in srgb, rgb(var(--pb-accent)) 7%, #ffffff);
+    border: 1px solid rgba(var(--pb-accent), 0.25);
+    border-left: 3px solid rgba(var(--pb-accent), 0.8);
 }
 
-/* Light theme overrides */
-.theme-light .callout[data-callout="progress"] {
-    background-color: #f5f3ff;
-    border: 1px solid rgba(100, 60, 200, 0.25);
-    border-left: 3px solid rgba(100, 60, 200, 0.8);
-}
-
-.theme-light .callout[data-callout="progress"] .callout-title {
-    color: #5b21b6;
+.theme-light .callout[data-callout^="progress"] .callout-title {
+    color: color-mix(in srgb, rgb(var(--pb-accent)) 78%, #000000);
 }
