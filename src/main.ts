@@ -10,6 +10,46 @@ import {
     SampleSettingTab,
 } from './settings';
 
+/**
+ * Supported optional colour tokens for the progress callout.
+ * Usage: `> [!progress]` (default) or `> [!progress bl]`, `> [!progress pi]`, ...
+ * Keys must stay in sync with the selectors in styles.css.
+ */
+const PROGRESS_COLOURS = [
+    'bl', // blue
+    'cy', // cyan
+    'te', // teal
+    'gr', // green
+    'li', // lime
+    'ye', // yellow
+    'am', // amber
+    'or', // orange
+    're', // red
+    'pi', // pink
+    'ma', // magenta
+    'pu', // purple
+    'in', // indigo
+    'br', // brown
+    'gy', // grey
+] as const;
+
+type ProgressColour = typeof PROGRESS_COLOURS[number];
+
+const COLOUR_SET: ReadonlySet<string> = new Set<string>(PROGRESS_COLOURS);
+
+/** Matches the callout line and captures the blockquote prefix and optional colour token. */
+const PROGRESS_LINE_RE = /^(\s*(?:>\s?)+)\[!progress(?:[ \-_]+([A-Za-z]{2,}))?\]/;
+
+const CHECKLIST_ITEM_RE = /^\s*[-*+]\s+\[( |x|X)\]/;
+const CHECKED_ITEM_RE = /^\s*[-*+]\s+\[x\]/i;
+
+interface ProgressBarLine {
+    /** Blockquote prefix, preserved verbatim so nested quotes survive a rewrite. */
+    prefix: string;
+    /** Normalised colour token, or null when the default styling applies. */
+    colour: ProgressColour | null;
+}
+
 export default class ChecklistProgressBar extends Plugin {
     settings!: MyPluginSettings;
 
@@ -45,85 +85,77 @@ export default class ChecklistProgressBar extends Plugin {
     private updateProgressBars(editor: Editor): void {
         const content = editor.getValue();
         const lines = content.split('\n');
-        const result = this.processLines(lines);
-        const newContent = result.join('\n');
+        const newContent = this.processLines(lines).join('\n');
 
         if (newContent !== content) {
             const cursor = editor.getCursor();
+            const scroll = editor.getScrollInfo();
             editor.setValue(newContent);
             editor.setCursor(cursor);
+            editor.scrollTo(scroll.left, scroll.top);
         }
     }
 
     private processLines(lines: string[]): string[] {
         const result: string[] = [];
-        let i = 0;
 
-        while (i < lines.length) {
+        for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            if (line === undefined) break;
+            if (line === undefined) continue;
 
-            if (this.isProgressBarLine(line)) {
-                // Find all checklist items between this progress bar and the next one
-                const checklistItems: string[] = [];
-                let j = i + 1;
-
-                while (j < lines.length) {
-                    const nextLine = lines[j];
-                    if (nextLine === undefined) break;
-
-                    // Stop at the next progress bar
-                    if (this.isProgressBarLine(nextLine)) break;
-
-                    if (this.isChecklistItem(nextLine)) {
-                        checklistItems.push(nextLine);
-                    }
-
-                    j++;
-                }
-
-                const total = checklistItems.length;
-                const checked = checklistItems.filter(l => this.isChecked(l)).length;
-
-                // Replace the progress bar line with updated values
-                result.push(this.buildProgressBar(checked, total));
-                i++;
-            } else {
+            const progressBar = this.parseProgressBarLine(line);
+            if (!progressBar) {
                 result.push(line);
-                i++;
+                continue;
             }
+
+            let total = 0;
+            let checked = 0;
+
+            for (let j = i + 1; j < lines.length; j++) {
+                const nextLine = lines[j];
+                if (nextLine === undefined) break;
+                if (this.parseProgressBarLine(nextLine)) break;
+
+                if (CHECKLIST_ITEM_RE.test(nextLine)) {
+                    total++;
+                    if (CHECKED_ITEM_RE.test(nextLine)) checked++;
+                }
+            }
+
+            result.push(this.buildProgressBar(progressBar, checked, total));
         }
 
         return result;
     }
 
-    private buildProgressBar(checked: number, total: number): string {
-        if (total === 0) return '> [!progress] No checklist items found';
+    /**
+     * Returns the parsed callout descriptor, or null when the line is not a progress bar.
+     * An unrecognised colour token is treated as the default palette so typos degrade gracefully.
+     */
+    private parseProgressBarLine(line: string): ProgressBarLine | null {
+        const match = PROGRESS_LINE_RE.exec(line);
+        if (!match) return null;
 
-        const percentage = Math.round((checked / total) * 100);
+        const prefix = match[1] ?? '> ';
+        const token = match[2]?.toLowerCase();
+
+        return {
+            prefix,
+            colour: token && COLOUR_SET.has(token) ? (token as ProgressColour) : null,
+        };
+    }
+
+    private buildProgressBar(source: ProgressBarLine, checked: number, total: number): string {
+        const label = source.colour ? `[!progress ${source.colour}]` : '[!progress]';
+
         const barLength = 20;
-        const filled = Math.round((checked / total) * barLength);
-        const empty = barLength - filled;
-        const bar = '█'.repeat(filled) + '░'.repeat(empty);
+        
+        const ratio = total === 0 ? 0 : checked / total;
+        const percentage = Math.round(ratio * 100);
+        const filled = Math.min(barLength, Math.max(0, Math.round(ratio * barLength)));
+        const bar = '█'.repeat(filled) + '░'.repeat(barLength - filled);
 
-
-        return `> [!progress] ${bar} ${checked}/${total} (${percentage}%)`;
-    }
-
-    private isProgressBarLine(line: string): boolean {
-        return /^>\s*\[!progress\]/.test(line);
-    }
-
-    private isChecklistItem(line: string): boolean {
-        return /^(\s*)-\s+\[( |x|X)\]/.test(line);
-    }
-
-    private isChecked(line: string): boolean {
-        return /^(\s*)-\s+\[x\]/i.test(line);
-    }
-
-    private getIndentLevel(line: string): number {
-        const match = line.match(/^(\s*)/);
-        return match ? match[1]?.length ?? 0 : 0;
+        return `${source.prefix}${label} ${bar} ${checked}/${total} (${percentage}%)`;
     }
 }

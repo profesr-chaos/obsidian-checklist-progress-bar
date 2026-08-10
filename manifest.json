@@ -1,7 +1,7 @@
 {
 	"id": "checklist-progress-bar",
 	"name": "Checklist Progress Bar",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.0.0",
 	"description": "Display a progress bar for your checklist (todo) items.",
 	"author": "Adam Tweedie",
