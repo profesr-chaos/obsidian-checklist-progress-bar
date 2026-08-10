@@ -74,8 +74,9 @@ export default class ChecklistProgressBar extends Plugin {
         );
     }
 
-    async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    async loadSettings(): Promise<void> {
+        const data = (await this.loadData()) as Partial<MyPluginSettings> | null;
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
     }
 
     async saveSettings() {
