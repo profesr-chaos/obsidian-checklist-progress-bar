@@ -1,13 +1,11 @@
 import { App, PluginSettingTab } from 'obsidian';
 import ChecklistProgressBar from './main';
 
-export interface MyPluginSettings {
-    // Ready for future settings
-}
+export type ChecklistProgressBarSettings = Record<string, never>;
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {};
+export const DEFAULT_SETTINGS: ChecklistProgressBarSettings = {};
 
-export class SampleSettingTab extends PluginSettingTab {
+export class ChecklistProgressBarSettingTab extends PluginSettingTab {
     plugin: ChecklistProgressBar;
 
     constructor(app: App, plugin: ChecklistProgressBar) {
@@ -18,7 +16,6 @@ export class SampleSettingTab extends PluginSettingTab {
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
-        containerEl.createEl('h2', { text: 'Checklist Progress Bar' });
         containerEl.createEl('p', { text: 'Progress bars are automatically displayed above checklist blocks.' });
     }
 }

@@ -5,9 +5,9 @@ import {
     WorkspaceLeaf,
 } from 'obsidian';
 import {
+    ChecklistProgressBarSettingTab,
+    ChecklistProgressBarSettings,
     DEFAULT_SETTINGS,
-    MyPluginSettings,
-    SampleSettingTab,
 } from './settings';
 
 /**
@@ -51,11 +51,11 @@ interface ProgressBarLine {
 }
 
 export default class ChecklistProgressBar extends Plugin {
-    settings!: MyPluginSettings;
+    settings!: ChecklistProgressBarSettings;
 
     async onload() {
         await this.loadSettings();
-        this.addSettingTab(new SampleSettingTab(this.app, this));
+        this.addSettingTab(new ChecklistProgressBarSettingTab(this.app, this));
 
         this.registerEvent(
             this.app.workspace.on('editor-change', (editor: Editor) => {
@@ -75,7 +75,7 @@ export default class ChecklistProgressBar extends Plugin {
     }
 
     async loadSettings(): Promise<void> {
-        const data = (await this.loadData()) as Partial<MyPluginSettings> | null;
+        const data = (await this.loadData()) as Partial<ChecklistProgressBarSettings> | null;
         this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
     }
 
