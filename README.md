@@ -2,7 +2,8 @@
 
 Automatically display a live progress bar above any checklist block in your Obsidian notes.
 
-![Progress bar example](image.png)
+![Progress bar example](<img width="747" height="369" alt="image" src="https://github.com/user-attachments/assets/9d05c7d9-c10c-488a-8a25-34356e7f124c" />
+)
 
 ---
 
