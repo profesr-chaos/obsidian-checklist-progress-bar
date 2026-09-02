@@ -1,5 +1,6 @@
 import {
     Editor,
+    EditorChange,
     MarkdownView,
     Plugin,
     WorkspaceLeaf,
@@ -83,17 +84,34 @@ export default class ChecklistProgressBar extends Plugin {
         await this.saveData(this.settings);
     }
 
+    /**
+     * Rewrites only the progress bar lines whose text has changed.
+     *
+     * Replacing the whole document with `setValue` resets the scroll position
+     * (and wipes undo history, folds and selections), so the changed lines are
+     * applied as a single transaction instead. `processLines` never adds or
+     * removes lines, so every change is confined to its own line and the
+     * positions stay valid for the whole batch.
+     */
     private updateProgressBars(editor: Editor): void {
-        const content = editor.getValue();
-        const lines = content.split('\n');
-        const newContent = this.processLines(lines).join('\n');
+        const lines = editor.getValue().split('\n');
+        const newLines = this.processLines(lines);
 
-        if (newContent !== content) {
-            const cursor = editor.getCursor();
-            const scroll = editor.getScrollInfo();
-            editor.setValue(newContent);
-            editor.setCursor(cursor);
-            editor.scrollTo(scroll.left, scroll.top);
+        const changes: EditorChange[] = [];
+        for (let i = 0; i < lines.length; i++) {
+            const oldText = lines[i];
+            const newText = newLines[i];
+            if (oldText === undefined || newText === undefined || oldText === newText) continue;
+
+            changes.push({
+                from: { line: i, ch: 0 },
+                to: { line: i, ch: oldText.length },
+                text: newText,
+            });
+        }
+
+        if (changes.length > 0) {
+            editor.transaction({ changes });
         }
     }
 
