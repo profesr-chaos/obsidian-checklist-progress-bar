@@ -59,24 +59,6 @@ Add an optional two letter colour code after `progress` to change the accent col
 | `gr` | Green   | `or` | Orange  | `br` | Brown   |
 | `re` | Red     | `pi` | Pink    | `gy` | Grey    |
 
-### Example
-
-```
-> [!progress gr] ████████████████████ 4/4 (100%)
-
-- [x] Draft the proposal
-- [x] Internal review
-- [x] Client sign off
-- [x] Kick off
-
-> [!progress am] █████░░░░░░░░░░░░░░░ 1/4 (25%)
-
-- [x] Set up staging
-- [ ] Migrate database
-- [ ] Smoke test
-- [ ] Cut over
-```
-
 ---
 
 ## Settings
