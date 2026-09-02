@@ -6,19 +6,6 @@ Automatically display a live progress bar above any checklist block in your Obsi
 
 ---
 
-## Release Notes
-
-### 1.0.1
-- **Optional colour codes.** Add a two letter code after `progress` to change the accent colour, for example `> [!progress bl]` for blue. 15 colours available, see [Colours](#colours). Unrecognised codes fall back to the default purple.
-- **Empty checklists now render a bar.** A progress callout with no items below it shows `0/0 (0%)` instead of the text "No checklist items found".
-- **Nested blockquotes preserved.** A progress bar inside a nested quote keeps its `>` prefix when it updates, rather than being flattened to a single level.
-- **Scroll position retained** when a bar updates in a long note.
-
-### 1.0.0
-- Initial release. Live progress bars above checklist blocks, multiple bars per note, dark and light theme styling.
-
----
-
 ## How It Works
 
 Place a `> [!progress]` callout directly above a checklist block. The plugin will automatically calculate how many items are checked and update the progress bar in real time as you tick things off.
@@ -34,20 +21,6 @@ Place a `> [!progress]` callout directly above a checklist block. The plugin wil
 ```
 
 No configuration needed — just drop in the callout and start checking things off.
-
----
-
-## Counter style
-
-By default the bar shows a fraction of checked items. If you prefer to see the open and done counts spelled out, change **Counter style** under **Settings → Checklist Progress Bar**:
-
-| Style | Example |
-|---|---|
-| Fraction *(default)* | `████████░░░░░░░░░░░░ 4/10 (40%)` |
-| Open and done | `████████░░░░░░░░░░░░ 6 open · 4 done (40%)` |
-| Both | `████████░░░░░░░░░░░░ 4/10 · 6 open (40%)` |
-
-The setting applies to every progress bar. The active note updates immediately; other notes update the next time they are edited.
 
 ---
 
@@ -111,10 +84,30 @@ Everything else works exactly the same. The colour is preserved as the bar updat
 
 ---
 
+## Settings
+
+Open **Settings → Checklist Progress Bar** to configure the plugin.
+
+### Counter style
+
+Controls how the item counts are shown after the bar. By default the bar shows a fraction of checked items. If you prefer to see the open and done counts spelled out, pick one of the other styles:
+
+| Style | Example |
+|---|---|
+| Fraction *(default)* | `████████░░░░░░░░░░░░ 4/10 (40%)` |
+| Open and done | `████████░░░░░░░░░░░░ 6 open · 4 done (40%)` |
+| Both | `████████░░░░░░░░░░░░ 4/10 · 6 open (40%)` |
+
+The setting applies to every progress bar in your vault. The note you have open updates immediately when you change it. Other notes update the next time they are edited.
+
+---
+
 ## Features
 
 - Live updates on every keystroke — no need to reload or save
+- Keeps your scroll position, cursor and undo history when a bar updates
 - Optional colour codes, 15 colours to choose from
+- Choice of fraction or open/done counters
 - Supports nested checklist items at any indentation level
 - Multiple progress bars per note, each tracking its own block and colour
 - Clean callout styling with both dark and light theme support
@@ -130,7 +123,7 @@ Everything else works exactly the same. The colour is preserved as the bar updat
 3. Click **Install**, then **Enable**
 
 ### Manual
-1. Download the latest release from [GitHub Releases](https://github.com/)
+1. Download the latest release from [GitHub Releases](https://github.com/profesr-chaos/obsidian-checklist-progress-bar/releases)
 2. Copy `main.js`, `manifest.json`, and `styles.css` into your vault at:
    ```
    <vault>/.obsidian/plugins/checklist-progress-bar/
