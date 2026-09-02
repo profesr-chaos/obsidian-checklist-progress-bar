@@ -41,15 +41,13 @@ No configuration needed — just drop in the callout and start checking things o
 
 ## Colours
 
-Add an optional two letter colour code after `progress` to change the accent colour of the bar. Without a code, the bar uses the default purple.
+Add an optional two letter colour code after `progress` to change the accent colour of the bar. 
 
 ```
 > [!progress]     ← default (purple)
 > [!progress bl]  ← blue
 > [!progress pi]  ← pink
 ```
-
-Everything else works exactly the same. The colour is preserved as the bar updates, and each bar in a note can use a different colour.
 
 ### Available colours
 
@@ -78,9 +76,6 @@ Everything else works exactly the same. The colour is preserved as the bar updat
 - [ ] Smoke test
 - [ ] Cut over
 ```
-<img width="831" height="957" alt="image" src="https://github.com/user-attachments/assets/fca8c901-c327-4f11-b438-9e2820cca43b" />
-
-> **Note:** An unrecognised colour code falls back to the default purple rather than breaking the bar, so a typo is harmless.
 
 ---
 
