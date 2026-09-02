@@ -8,8 +8,9 @@ import {
 import {
     ChecklistProgressBarSettingTab,
     ChecklistProgressBarSettings,
-    DEFAULT_SETTINGS,
+    normaliseSettings,
 } from './settings';
+import { formatCounter } from './counter';
 
 /**
  * Supported optional colour tokens for the progress callout.
@@ -76,12 +77,19 @@ export default class ChecklistProgressBar extends Plugin {
     }
 
     async loadSettings(): Promise<void> {
-        const data = (await this.loadData()) as Partial<ChecklistProgressBarSettings> | null;
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+        this.settings = normaliseSettings(await this.loadData());
     }
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    /** Re-renders the progress bars in the active note, e.g. after a setting changes. */
+    refreshActiveEditor(): void {
+        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (view?.editor) {
+            this.updateProgressBars(view.editor);
+        }
     }
 
     /**
@@ -174,7 +182,8 @@ export default class ChecklistProgressBar extends Plugin {
         const percentage = Math.round(ratio * 100);
         const filled = Math.min(barLength, Math.max(0, Math.round(ratio * barLength)));
         const bar = '█'.repeat(filled) + '░'.repeat(barLength - filled);
+        const counter = formatCounter(this.settings.counterStyle, checked, total);
 
-        return `${source.prefix}${label} ${bar} ${checked}/${total} (${percentage}%)`;
+        return `${source.prefix}${label} ${bar} ${counter} (${percentage}%)`;
     }
 }
