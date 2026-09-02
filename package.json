@@ -1,6 +1,6 @@
 {
 	"name": "checklist-progress-bar",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "Display a progress bar for your checklist (todo) items.",
 	"main": "main.js",
 	"type": "module",
