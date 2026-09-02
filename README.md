@@ -24,6 +24,20 @@ No configuration needed — just drop in the callout and start checking things o
 
 ---
 
+## Counter style
+
+By default the bar shows a fraction of checked items. If you prefer to see the open and done counts spelled out, change **Counter style** under **Settings → Checklist Progress Bar**:
+
+| Style | Example |
+|---|---|
+| Fraction *(default)* | `████████░░░░░░░░░░░░ 4/10 (40%)` |
+| Open and done | `████████░░░░░░░░░░░░ 6 open · 4 done (40%)` |
+| Both | `████████░░░░░░░░░░░░ 4/10 · 6 open (40%)` |
+
+The setting applies to every progress bar. The active note updates immediately; other notes update the next time they are edited.
+
+---
+
 ## Usage
 
 1. Open any note with a checklist
@@ -45,7 +59,7 @@ No configuration needed — just drop in the callout and start checking things o
 - Supports nested checklist items at any indentation level
 - Multiple progress bars per note, each tracking its own block
 - Clean callout styling with both dark and light theme support
-- Zero configuration required
+- Zero configuration required, with an optional counter style setting
 
 ---
 
